@@ -1,0 +1,97 @@
+<!-- jQuery -->
+<script src="{{ asset('assetad/plugins/jquery/jquery.min.js') }}"></script>
+<!-- maps -->
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDas45XqaLmyBoLtLlxHQ3R5oLLYirbdXs&callback=loadMap&libraries=geometry"></script>
+
+<script type="text/javascript">
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    var id_jenis = '';
+    var markers = [];
+    getData();
+
+    //FILTER
+    $('#kategori').change(function() {
+        id_jenis = $('#kategori').val();
+        getData();
+        markers = [];
+    });
+
+    function getData() {
+
+        $.ajax({
+            type: "POST",
+            url: "{{ url('peta_cagar_budaya') }}",
+            data: {
+                id : id_jenis
+            },
+            dataType: 'json',
+            success: function(res) {
+
+            $.each(res, function(i, response) {
+                markers.push([response.nama_objek, 
+                                parseFloat(response.longitude), 
+                                parseFloat(response.latitude),
+                                response.nama_objek,
+                                response.keterangan,
+                                response.url_objek,
+                                response.foto,
+                                ]);
+            });
+
+            initialize();
+            }
+        });
+    }
+
+    //cagar budaya nasional, kominfo, dinas pendidikan, siakkab, epusda, siak badelau
+ 
+    function initialize() {
+        console.log(markers);
+        var mapCanvas = document.getElementById('googleMap');
+        var mapOptions = {
+            center: new google.maps.LatLng(0.8085586156104532, 102.02639887197164),
+            zoom:9,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }     
+        var map = new google.maps.Map(mapCanvas, mapOptions)
+
+        var infowindow = new google.maps.InfoWindow(), marker, i;
+        var bounds = new google.maps.LatLngBounds(); // diluar looping
+        for (i = 0; i < markers.length; i++) {  
+
+            pos = new google.maps.LatLng(markers[i][1], markers[i][2]);
+            bounds.extend(pos); // di dalam looping
+            marker = new google.maps.Marker({
+                position: pos,
+                map: map
+            });
+
+            
+
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+
+                url_img = '{{asset("image/cagar_budaya")}}'
+                img = url_img + '/'+ markers[i][6];
+                url = '{{ url("") }}';
+                konten = '<div style="width:300px;"><h5>'+ markers[i][2] +'</h5><img class="w-100 img-fluid " src="'+img+'"><div>'+ markers[i][4].substring(0,150) +'...</div><a href="'+ url+'/'+markers[i][5] +'") }}" class="mt-2 btn btn-sm btn-success w-100">selengkapnya</a></div>';
+
+                return function() {
+                    // infowindow.setContent(markers[i][0]);
+                    infowindow.setContent('<div style="width:300px;"><h5>'+ markers[i][3] +'</h5><img class="w-100 img-fluid " src="'+url_img + '/'+ markers[i][6]+'"><div class="mt-2">'+ markers[i][4].substring(0,150) +'...</div><a href="'+ url+'/'+markers[i][5] +'") }}" class="mt-2 btn btn-sm btn-success w-100">selengkapnya</a></div>');
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
+            map.fitBounds(bounds); // setelah looping
+        }
+
+    }
+    
+    google.maps.event.addDomListener(window, 'load', initialize);
+</script>
