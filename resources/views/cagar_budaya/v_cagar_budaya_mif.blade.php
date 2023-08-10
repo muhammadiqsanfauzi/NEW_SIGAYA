@@ -421,7 +421,7 @@ $('body').on('click', '.buttonedit', function(){
             {
           "data": "id",
           render: function (data, type, row, meta) {
-                  let url='https://sicabud.siakkab.go.id';
+                  let url='https://sigaya.siakkab.go.id';
                   
             let button = '<button id="'+data+'" id_objek="'+row['id_objek']+'" nama_objek="'+row['nama_objek']+'"  jenis_objek="'+row['jenis_objek_id']+'" kode_alamat="'+row['kode_alamat']+'" longitude="'+row['longitude']+'" latitude="'+row['latitude']+'"keterangan="'+row['keterangan']+'" class="buttonedit btn btn-sm btn-flat btn-primary "><i class="fas fa-fw fa-edit"></i></button> \n\
                     <a href="'+url+'/hapus/cagar_budaya/'+data+'" onclick="javascript:return confirm(\'Apakah Anda yakin Ingin Menghapus Data ?\')"class=" btn btn-sm btn-flat btn-dark"><i class="fas fa-fw fa-trash-alt"></i></a>';
